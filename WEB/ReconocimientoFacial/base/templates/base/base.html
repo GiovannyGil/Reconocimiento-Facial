@@ -1,0 +1,62 @@
+{% load static %}
+<!-- sidebar darkmode con tailwind css-->
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwindcss.min.css">
+  <title>Django</title>
+</head>
+<body>
+  <header class="text-gray-400 bg-gray-900 body-font">
+    <div
+      class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center"
+    >
+      <a
+        class="flex title-font font-medium items-center text-white mb-4 md:mb-0"
+      >
+        {% comment %} <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          class="w-10 h-10 text-white p-2 bg-purple-500 rounded-full"
+          viewBox="0 0 24 24"
+        > {% endcomment %}
+          <path
+            d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+          ></path>
+        </svg>
+        <span class="ml-3 text-xl" >Sistema de Reconocimiento Facial</span>
+      </a>
+      <nav
+        class="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center"
+      >
+      {% comment %} si esta autenticado mostrar las rutas siguientes {% endcomment %}
+        {% if user.is_authenticated %}
+        <a class="mr-5 hover:text-white" href="{% url 'dash' %}">Inicio</a>
+      </nav>
+      <span>{{user.username | upper }}</span>
+      <a
+        class="inline-flex items-center bg-gray-800 border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-base mt-4 md:mt-0" href="{% url 'logout' %}">
+        Cerrar Sessión
+      </a>
+        {% comment %} si no esta autenticado mostrar las rutas siguientes {% endcomment %}
+        {% else %}
+        <a class="inline-flex items-center bg-gray-800 border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-base mt-4 md:mt-0" href="{% url 'login' %}">Iniciar Sessión</a>
+        {% endif %}
+    </div>
+  </header>
+
+  {% block content %}
+  
+  {% endblock %}
+
+  <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwindcss.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+</body>
