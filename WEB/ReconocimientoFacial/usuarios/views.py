@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Persona, Cargo
+from .models import Persona
 from .forms import PersonaForm
 from django.contrib.auth.models import User  # registrar usuarios
 from django.contrib.auth.decorators import login_required
@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 def usuariosList(request):
     GetPersonas = Persona.objects.all() # traer todos los registros de la tabla Persona
     return render(request, "usuarios/index.html", {
-        'peronsas':GetPersonas # pasarle los registros a la vista
+        'personas':GetPersonas # pasarle los registros a la vista
     })
     
 @login_required(login_url='/login/')
@@ -33,16 +33,28 @@ def usuariosAdd(request):
             })
             
 @login_required(login_url='/login/')
-def usuariosRemove(request, UsuarioID):
-    usuarioPersona = get_object_or_404(pk=UsuarioID)
+def usuariosRemove(request, pk):
+    usuarioPersona = get_object_or_404(pk=pk)
     if(request.method == 'POST'):
         usuarioPersona.delete() # elimine el usuario/Persona
-        return redirect('ListUsers') 
+    return redirect('ListUsers') 
 
 @login_required(login_url='/login/')
-def usuariosDetail(request):
-    return render(request, "usuarios/UserDetail.html")
+def usuariosDetail(request, pk):
+    usuario = get_object_or_404(Persona, pk=pk)
+    # detalles = {
+    #     'usuario':usuario,
+    # }
+    return render(request, "usuarios/UserDetail.html",{'usuario':usuario})
 
 @login_required(login_url='/login/')
-def usuariosUpdate(request):
-    return render(request, "usuarios/UpdateUser.html")
+def usuariosUpdate(request, pk):
+    usuario = get_object_or_404(Persona, pk=pk)
+    if request.method == 'PUT':
+        form = PersonaForm(request.POST, instance=usuario)
+        if form.is_valid():
+            form.save()
+            return redirect('ListUsers')
+    else:
+        form = PersonaForm(instance=usuario)
+    return render(request, "usuarios/UpdateUser.html",{'usuario':usuario})

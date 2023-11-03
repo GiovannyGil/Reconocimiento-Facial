@@ -100,6 +100,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+#AUTH_USER_MODEL = 'Usuarios.CustomUser'  # que al crear la base de datos, use el modelo de Usuarios, donde se hereda y agrega un nuevo campo a la tabla usuarios
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
