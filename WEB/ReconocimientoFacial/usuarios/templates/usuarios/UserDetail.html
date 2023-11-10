@@ -19,7 +19,7 @@
 							<div class="w-24 h-24 mr-8 flex-none rounded-xl border overflow-hidden">
 								{% if usuario.foto %}
                                     {% comment %} <img class="w-24 h-24 mr-8 object-cover" src="{{ usuario.foto }}" alt=""> {% endcomment %}
-                                    <img src="{{ usuario.foto }}" alt="">
+                                    <img src="{{ usuario.foto.url }}" alt="">
 
                                 {% else %}
                                     <p>No hay foto disponible para este usuario.</p>
@@ -60,7 +60,12 @@
 								</div>
 							</div>
 						</div>
+						<a type="submit" class="my-5 w-full flex justify-center bg-blue-500 text-gray-100 p-4  rounded-full tracking-wide
+										font-semibold  focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300" href="{% url 'ListUsers' %}">
+							Volver
+						</a>
 					</div>
 				</div>
+				
 			</div>
 {% endblock %}

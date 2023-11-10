@@ -1,14 +1,7 @@
 {% extends "base/base.html" %}
 {% load static %}
-<head>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwindcss.min.css">
 
-
-    {% comment %} icons {% endcomment %}
-    
-</head>
 {% block content %}
-
 <a
 type="button"
 title="Agregar Nuevos Usuarios"
@@ -24,6 +17,7 @@ class="border border-gray-700 bg-gray-700 text-white rounded-md px-4 py-2 m-2 tr
         <table id="example" class="display" style="width:100%">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>nombres</th>
                     <th>apellidos</th>
                     <th>documento</th>
@@ -31,9 +25,10 @@ class="border border-gray-700 bg-gray-700 text-white rounded-md px-4 py-2 m-2 tr
                     <th>Acciones</th>
                 </tr>
             </thead>
-            {% for per in personas %}
                 <tbody>
+                {% for per in personas %}
                     <tr>
+                        <td>{{per.id}}</td>
                         <td>{{per.nombres}}</td>
                         <td>{{per.apellidos}}</td>
                         <td>{{per.documento}}</td>
@@ -58,10 +53,11 @@ class="border border-gray-700 bg-gray-700 text-white rounded-md px-4 py-2 m-2 tr
                             </div>
                         </td>
                     </tr>
+                {% endfor %}
                 </tbody>
-            {% endfor %}
             <tfoot>
                 <tr>
+                    <th>ID</th>
                     <th>nombres</th>
                     <th>apellidos</th>
                     <th>documento</th>
@@ -77,3 +73,6 @@ class="border border-gray-700 bg-gray-700 text-white rounded-md px-4 py-2 m-2 tr
 </script>
 
 {% endblock %}
+<script>
+    new DataTable('#example');
+</script>

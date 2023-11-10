@@ -4,7 +4,7 @@ import numpy as np
 import face_recognition as fr
 import sqlite3
 from datetime import datetime
-import os
+import os.path
 from django.db import connections
 import django
 
@@ -12,27 +12,32 @@ import django
 #path_DDBB_Django = '/home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/db.sqlite3'
 
 # configuracion de conexion don el proyecto DJango
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ReconocimientoFacial.settings")
-import django
-django.setup()
+# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ReconocimientoFacial.settings")
+# django.setup()
 
-# Obtén la ruta del directorio actual donde se encuentra el script
-script_directory = os.path.dirname(os.path.abspath(__file__))
+# # Obtén la ruta del directorio actual donde se encuentra el script
+# script_directory = os.path.dirname(os.path.abspath(__file__))
 
-# Define la ruta relativa a la base de datos de Django
-relative_path_DDBB_Django = os.path.join(script_directory, 'WEB/ReconocimientoFacial/db.sqlite3')
+# # Define la ruta relativa a la base de datos de Django
+# relative_path_DDBB_Django = os.path.join(script_directory, '/home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/ReconocimientoF.db')
+# relative_path_DDBB_Django = os.path.join(script_directory, 'WEB/ReconocimientoFacial/ReconocimientoF.db')
 
-# Configura la conexión a la base de datos de Django
-db = connections['default']
+# # Configura la conexión a la base de datos de Django
+# db = connections['default']
 # db.database_name = relative_path_DDBB_Django
 
-# Crear conexión a la base de datos
-conn = db.connection
+# # Crear conexión a la base de datos
+# conn = db.connection
+script_directory = '/home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/media'
+
+# /home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/db.sqlite3
 #extraer la conexión
+# Crear conexión a la base de datos
+conn = sqlite3.connect('/home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/ReconocimientoF.db')
 cursor = conn.cursor()
 
 # Consulta SQL para obtener datos de los usuarios
-cursor.execute('SELECT nombres, apellidos, foto FROM Persona')
+cursor.execute('SELECT nombres, apellidos, foto FROM usuarios_persona')
 
 #extraer los datos de la consulta
 users_data = cursor.fetchall()
@@ -59,7 +64,7 @@ def registrar_registro(usuario_id):
     # Verificar si ha pasado al menos 10 segundos desde el último registro
     if ultima_hora_registro is None or (hora_actual - ultima_hora_registro).total_seconds() >= 10:
         # Insertar el registro en la tabla Registros
-        cursor.execute("INSERT INTO Registros (UsuariosID, Fecha) VALUES (?, ?)", (usuario_id, hora_entrada))
+        cursor.execute("INSERT INTO usuarios_registros (UsuarioID_id, fecha) VALUES (?, ?)", (usuario_id, hora_entrada))
         conn.commit() # guardar cambios
         ultima_hora_registro = hora_actual # comparar horas (verificar si genera otro registro o no)
 
@@ -98,7 +103,8 @@ while True:
             nombre = user_data[0] # estraer el nombre
             apellido = user_data[1] # estraer el apellido
             foto_path = user_data[2] # estraer la foto (LA RUTA DE LA FOTO)
-            known_image = fr.load_image_file(foto_path) # cargar ruta de la foto
+            known_image_path = os.path.join(script_directory, foto_path)
+            known_image = fr.load_image_file(known_image_path) # cargar ruta de la foto
             known_face_encoding = fr.face_encodings(known_image)[0] # 
 
             results = fr.compare_faces([known_face_encoding], faceCod)
@@ -127,7 +133,7 @@ while True:
                 print('Acceso Denegado')
             
             # agregar un registro a la tabla (REGISTROS) de la BBDD cada 10 seundos (si es el mismo rostro)
-            cursor.execute("SELECT ID FROM Usuarios WHERE Nombres = ?", (nombre,))
+            cursor.execute("SELECT ID FROM usuarios_persona WHERE nombres = ?", (nombre,))
             result = cursor.fetchone()
             if result:
                 usuario_id = result[0]

@@ -34,9 +34,10 @@ def usuariosAdd(request):
             
 @login_required(login_url='/login/')
 def usuariosRemove(request, pk):
-    usuarioPersona = get_object_or_404(pk=pk)
-    if(request.method == 'POST'):
-        usuarioPersona.delete() # elimine el usuario/Persona
+    usuarioPersona = get_object_or_404(Persona, id=pk)
+    usuarioPersona.delete()
+    # if(request.method == 'POST'):
+    #     usuarioPersona.delete() # elimine el usuario/Persona
     return redirect('ListUsers') 
 
 @login_required(login_url='/login/')
@@ -50,7 +51,7 @@ def usuariosDetail(request, pk):
 @login_required(login_url='/login/')
 def usuariosUpdate(request, pk):
     usuario = get_object_or_404(Persona, pk=pk)
-    if request.method == 'PUT':
+    if request.method == 'POST':
         form = PersonaForm(request.POST, instance=usuario)
         if form.is_valid():
             form.save()

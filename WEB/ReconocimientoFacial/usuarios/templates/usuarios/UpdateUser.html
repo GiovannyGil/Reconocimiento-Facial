@@ -12,17 +12,18 @@
                 <div class="mt-5">
                     <div class="form">
                         <div class="md:space-y-2 mb-3">
-                            <div class="flex items-center py-6">
-                                <div class="w-24 h-24 mr-8 flex-none rounded-xl border overflow-hidden">
-                                    <img class="w-24 h-24 mr-8 object-cover" src="{{ usuario.foto.url }}" alt="">
-                                </div>
-                                <div class="flex flex-col sm:flex-row items-center">
-                                    <h2 class="font-semibold text-lg mr-auto">ACTUALIZAR USUARIO</h2>
-                                    <div class="w-full sm:w-auto sm:ml-auto mt-3 sm:mt-0"></div>
-                                </div>
-                            </div>
                             <form method="post" enctype="multipart/form-data">
                                 {% csrf_token %}
+                                <div class="flex items-center py-6">
+                                    <div class="w-24 h-24 mr-8 flex-none rounded-xl border overflow-hidden">
+                                        <img class="w-24 h-24 mr-8 object-cover" src="{{ usuario.foto.url }}" id="img" alt="{{usuario.nombres}}">
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row items-center">
+                                        <h2 class="font-semibold text-lg mr-auto">ACTUALIZAR USUARIO</h2>
+                                        <div class="w-full sm:w-auto sm:ml-auto mt-3 sm:mt-0"></div>
+                                    </div>
+                                </div>
+                                <input type="hidden" value="{{usuario.id}}">
                                 <div class="md:flex flex-row md:space-x-4 w-full text-xs">
                                     <div class="mb-3 space-y-2 w-full text-xs">
                                         <label class="font-semibold text-gray-600 py-2">Nombres</label>
@@ -45,12 +46,23 @@
                                         <input placeholder="" class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded-lg h-10 px-4" type="text" name="contacto" value="{{ usuario.contacto }}">
                                     </div>
                                 </div>
-                                <div>
-                                    <button type="submit" class="my-5 w-full flex justify-center bg-blue-500 text-gray-100 p-4  rounded-full tracking-wide
-                                        font-semibold  focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300">
+                                <div class="md:flex md:flex-row md:space-x-4 w-full text-xs">
+                                    <div class="w-full flex flex-col mb-3">
+                                        <label class="font-semibold text-gray-600 py-2">Foto</label>
+                                        <input placeholder="" class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded-lg h-10 px-4" type="file" name="contacto" id="input" value="{{ usuario.foto.url }}">
+                                    </div>
+                                </div>
+                                <div class="flex justify-between">
+                                    <button type="submit" class="my-5 self-end flex justify-center bg-blue-500 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300">
                                         Guardar
                                     </button>
+                                    <button type="button" class="my-5 self-end flex justify-center bg-green-600 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300">
+                                        <a href="{% url 'ListUsers' %}" type="submit" class="">
+                                            Volver
+                                        </a>
+                                    </button>
                                 </div>
+                                
                             </form>
                         </div>
                     </div>
@@ -59,4 +71,13 @@
         </div>
     </div>
 </div>
+<script>
+    let img = document.getElementById('img')
+    let input = document.getElementById('input')
+
+    input.onchange = (e) =>{
+        if (input.files[0])
+        img.src = URL.createObjectURL(input.files[0])
+    }
+</script>
 {% endblock %}

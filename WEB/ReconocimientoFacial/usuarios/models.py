@@ -32,3 +32,9 @@ class Persona(models.Model):
 
     def __str__(self):
         return self.apellidos
+
+
+class Registros(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    UsuarioID = models.ForeignKey(Persona, on_delete=models.CASCADE)
+    fecha = models.DateTimeField(auto_now_add=True)

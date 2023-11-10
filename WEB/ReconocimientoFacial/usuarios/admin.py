@@ -5,3 +5,4 @@ from . import models
 
 #admin.site.register(models.Cargo)
 admin.site.register(models.Persona)
+admin.site.register(models.Registros)
