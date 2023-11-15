@@ -5,35 +5,24 @@ import face_recognition as fr
 import sqlite3
 from datetime import datetime
 import os.path
-from django.db import connections
-import django
 
 # ruta de la base de datos conectada que usa la app de Django
-#path_DDBB_Django = '/home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/db.sqlite3'
-
-# configuracion de conexion don el proyecto DJango
-# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ReconocimientoFacial.settings")
-# django.setup()
-
-# # Obtén la ruta del directorio actual donde se encuentra el script
-# script_directory = os.path.dirname(os.path.abspath(__file__))
-
-# # Define la ruta relativa a la base de datos de Django
-# relative_path_DDBB_Django = os.path.join(script_directory, '/home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/ReconocimientoF.db')
-# relative_path_DDBB_Django = os.path.join(script_directory, 'WEB/ReconocimientoFacial/ReconocimientoF.db')
-
-# # Configura la conexión a la base de datos de Django
-# db = connections['default']
-# db.database_name = relative_path_DDBB_Django
-
 # # Crear conexión a la base de datos
-# conn = db.connection
-script_directory = '/home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/media'
+
+# ruta principal
+main_directory = '/home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/'
+
+# ruta para ir a la media => ubicacion de las fotos
+media_directory = 'media/'
+
+# ruta de la base de datos
+database_directory = 'ReconocimientoF.db'
 
 # /home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/db.sqlite3
+
 #extraer la conexión
 # Crear conexión a la base de datos
-conn = sqlite3.connect('/home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/ReconocimientoF.db')
+conn = sqlite3.connect(os.path.join(main_directory, database_directory))
 cursor = conn.cursor()
 
 # Consulta SQL para obtener datos de los usuarios
@@ -46,8 +35,8 @@ users_data = cursor.fetchall()
 x1, y1, x2, y2 = 0, 0, 0, 0
 
 # Declaración de colores para el recuadro en camara
-color_verde = (0, 255, 0)  # R, G, B para verde
-color_rojo = (0, 0, 255)  # R, G, B para rojo
+color_verde = (0, 255, 0)  # B, G, R para verde
+color_rojo = (0, 0, 255)  # B, G, R para rojo
 
 # variable de tiempo
 ultima_hora_registro = None
@@ -103,7 +92,7 @@ while True:
             nombre = user_data[0] # estraer el nombre
             apellido = user_data[1] # estraer el apellido
             foto_path = user_data[2] # estraer la foto (LA RUTA DE LA FOTO)
-            known_image_path = os.path.join(script_directory, foto_path)
+            known_image_path = os.path.join(main_directory, media_directory, foto_path) # complemento de la ruta raiz con la ruta de la foto
             known_image = fr.load_image_file(known_image_path) # cargar ruta de la foto
             known_face_encoding = fr.face_encodings(known_image)[0] # 
 

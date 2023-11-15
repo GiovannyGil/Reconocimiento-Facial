@@ -3,6 +3,7 @@ from .models import Persona
 from .forms import PersonaForm
 from django.contrib.auth.models import User  # registrar usuarios
 from django.contrib.auth.decorators import login_required
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 # Create your views here.
 
@@ -15,9 +16,7 @@ def usuariosList(request):
     
 @login_required(login_url='/login/')
 def usuariosAdd(request):
-    # if request.method == 'GET':
-    #     return render(request, "usuarios/addUser.html")
-    # else:
+    if request.method == 'POST':
         try:
             form = PersonaForm(request.POST) # valia que sea el metodo post y envia
             NuevaPersona = form.save(commit=False)
@@ -31,6 +30,9 @@ def usuariosAdd(request):
                 'form' : PersonaForm,
                 'error' : "Comprueba que los datos esten correctos"
             })
+    else:
+        return render(request, "usuarios/addUser.html")
+        
             
 @login_required(login_url='/login/')
 def usuariosRemove(request, pk):
@@ -43,19 +45,25 @@ def usuariosRemove(request, pk):
 @login_required(login_url='/login/')
 def usuariosDetail(request, pk):
     usuario = get_object_or_404(Persona, pk=pk)
-    # detalles = {
-    #     'usuario':usuario,
-    # }
     return render(request, "usuarios/UserDetail.html",{'usuario':usuario})
 
 @login_required(login_url='/login/')
 def usuariosUpdate(request, pk):
     usuario = get_object_or_404(Persona, pk=pk)
+
     if request.method == 'POST':
-        form = PersonaForm(request.POST, instance=usuario)
+        form = PersonaForm(request.POST, request.FILES, instance=usuario)
+
         if form.is_valid():
+            nueva_foto = request.FILES.get('foto', None)
+
+            # Si se proporciona una nueva foto, actualiza la propiedad de la foto
+            if nueva_foto:
+                usuario.foto = nueva_foto
+
             form.save()
             return redirect('ListUsers')
     else:
         form = PersonaForm(instance=usuario)
-    return render(request, "usuarios/UpdateUser.html",{'usuario':usuario})
+
+    return render(request, "usuarios/UpdateUser.html", {'usuario': usuario, 'form': form})

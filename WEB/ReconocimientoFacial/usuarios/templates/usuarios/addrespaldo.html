@@ -1,3 +1,5 @@
+
+
 {% extends "base/base.html" %}
 {% load static %}
 
@@ -49,19 +51,21 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 space-y-2">
-                        <label class="text-sm font-bold text-gray-500 tracking-wide">Foto</label>
-                        <div class="flex items-center justify-center w-full">
-                            <label class="flex flex-col rounded-lg border-4 border-dashed w-full h-60 p-10 group text-center">
-                                <div class="h-full w-full text-center flex flex-col items-center justify-center items-center" >
-                                    <div class="flex flex-auto max-h-48 w-2/5 mx-auto -mt-10">
+                    <div class="flex items-center justify-center w-full">
+                        <label class="flex flex-col rounded-lg border-4 border-dashed w-full h-60 p-10 group text-center">
+                            <div class="h-full w-full text-center flex flex-col items-center justify-center items-center">
+                                <div class="flex flex-auto max-h-48 w-2/5 mx-auto -mt-10">
                                     <img class="has-mask h-36 object-center" src="https://img.freepik.com/free-vector/image-upload-concept-landing-page_52683-27130.jpg?size=338&ext=jpg" alt="freepik image" id="img">
-                                    </div>
-                                    <p class="pointer-none text-gray-500 "><span class="text-sm">Arrastra y suelta</span> archivos aquí <br /> o <a href="" id="" class="text-blue-600 hover:underline">seleccione un archivo</a> de su computadora</p>
                                 </div>
-                                <input type="file" class="hidden" name="foto" id="input">
-                            </label>
-                        </div>
+                                <p class="pointer-none text-gray-500">
+                                    <span class="text-sm">
+                                        <a href="#" onclick="selectFromComputer()">Subir desde la computadora</a> |
+                                        <a href="#" onclick="captureFromCamera()">Tomar una foto</a>
+                                    </span>
+                                </p>
+                            </div>
+                            <input type="file" accept="image/*" class="hidden" name="foto" id="input">
+                        </label>
                     </div>
                             <p class="text-sm text-gray-300">
                                 <span>Tipo de Fotos: Png, Jpg</span>
@@ -85,13 +89,84 @@
 
 
 <script>
+    function selectFromComputer() {
+        input.click();
+    }
+
+    function captureFromCamera() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                const videoTrack = stream.getVideoTracks()[0];
+                const imageCapture = new ImageCapture(videoTrack);
+        
+                return imageCapture.takePhoto();
+            })
+            .then((blob) => {
+                // Muestra la foto en la vista previa
+                img.src = URL.createObjectURL(blob);
+    
+                // Crea un objeto FormData y adjunta la imagen capturada
+                const formData = new FormData();
+                formData.append('foto', blob, 'captured.jpg');
+    
+                // Realiza una solicitud AJAX para enviar la foto al servidor
+                fetch('/url_de_tu_vista/', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Maneja la respuesta del servidor si es necesario
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error('Error al enviar la foto al servidor:', error);
+                });
+    
+                // Cierra la cámara
+                stream.getTracks().forEach(track => track.stop());
+            })
+            .catch((error) => {
+                console.error('Error al abrir la cámara:', error);
+            });
+    }
+    
+    
+
     let img = document.getElementById('img')
     let input = document.getElementById('input')
 
-    input.onchange = (e) =>{
+    input.onchange = (e) => {
         if (input.files[0])
-        img.src = URL.createObjectURL(input.files[0])
+            img.src = URL.createObjectURL(input.files[0])
     }
 </script>
 
+
+
 {% endblock %}
+
+
+@login_required(login_url='/login/')
+def usuariosAdd(request):
+    if request.method == 'POST':
+        try:
+            form = PersonaForm(request.POST, request.FILES)
+            if form.is_valid():
+                NuevaPersona = form.save(commit=False)
+                if 'foto' in request.FILES:
+                    NuevaPersona.foto = request.FILES['foto']
+                NuevaPersona.save()
+                return redirect('ListUsers')
+            else:
+                # Muestra errores de validación si el formulario no es válido
+                print(form.errors)
+                return HttpResponse(status=400)  # Devuelve una respuesta de error 400 Bad Request
+        except Exception as e:
+            print(f"Error en la vista usuariosAdd: {str(e)}")
+            return HttpResponse(status=500)  # Devuelve una respuesta de error 500 Internal Server Error
+    elif request.method == 'GET':
+        # Si no es una solicitud POST, simplemente renderiza el formulario vacío
+        return render(request, "usuarios/addUser.html", {'form': PersonaForm})
+
+    return HttpResponse(status=400)  # Devuelve una respuesta de error 400 Bad Request para casos inesperados

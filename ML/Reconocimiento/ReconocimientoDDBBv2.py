@@ -8,31 +8,13 @@ import os
 from django.db import connections
 import django
 
-# ruta de la base de datos conectada que usa la app de Django
-#path_DDBB_Django = '/home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/db.sqlite3'
+conn = sqlite3.connect('reconocimiento.db')
 
-# configuracion de conexion don el proyecto DJango
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ReconocimientoFacial.settings")
-import django
-django.setup()
-
-# Obtén la ruta del directorio actual donde se encuentra el script
-script_directory = os.path.dirname(os.path.abspath(__file__))
-
-# Define la ruta relativa a la base de datos de Django
-relative_path_DDBB_Django = os.path.join(script_directory, 'WEB/ReconocimientoFacial/db.sqlite3')
-
-# Configura la conexión a la base de datos de Django
-db = connections['default']
-# db.database_name = relative_path_DDBB_Django
-
-# Crear conexión a la base de datos
-conn = db.connection
 #extraer la conexión
 cursor = conn.cursor()
 
 # Consulta SQL para obtener datos de los usuarios
-cursor.execute('SELECT nombres, apellidos, foto FROM Persona')
+cursor.execute('SELECT Nombres, Apellidos, Foto FROM Usuarios')
 
 #extraer los datos de la consulta
 users_data = cursor.fetchall()
@@ -59,7 +41,7 @@ def registrar_registro(usuario_id):
     # Verificar si ha pasado al menos 10 segundos desde el último registro
     if ultima_hora_registro is None or (hora_actual - ultima_hora_registro).total_seconds() >= 10:
         # Insertar el registro en la tabla Registros
-        cursor.execute("INSERT INTO Registros (UsuariosID, Fecha) VALUES (?, ?)", (usuario_id, hora_entrada))
+        cursor.execute("INSERT INTO Registros (UsuarioID, Fecha) VALUES (?, ?)", (usuario_id, hora_entrada))
         conn.commit() # guardar cambios
         ultima_hora_registro = hora_actual # comparar horas (verificar si genera otro registro o no)
 
