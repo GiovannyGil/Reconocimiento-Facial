@@ -50,10 +50,10 @@ with mp_face_mesh.FaceMesh(
             # y -= 10
             # w += 20
             # h += 20
-            x -= 50
-            y -= 50
-            w += 100
-            h += 100
+            x -= 25
+            y -= 25
+            w += 50
+            h += 50
             cv2.rectangle(frame_copy, (x, y), (x + w, y + h), (0, 255, 0), 2)
         
         if results.multi_face_landmarks is not None:

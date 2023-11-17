@@ -6,11 +6,8 @@ import sqlite3
 from datetime import datetime
 import os.path
 
-# ruta de la base de datos conectada que usa la app de Django
-# # Crear conexión a la base de datos
-
 # ruta principal
-main_directory = '/home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/'
+main_directory = os.path.dirname(os.path.abspath(__file__)) # obtener la ruta principal dinamicamente en cualquier sitio y S.O
 
 # ruta para ir a la media => ubicacion de las fotos
 media_directory = 'media/'
@@ -18,9 +15,6 @@ media_directory = 'media/'
 # ruta de la base de datos
 database_directory = 'ReconocimientoF.db'
 
-# /home/jorge/Documentos/Sistema-Reconocimiento-Facial-Instalaciones/WEB/ReconocimientoFacial/db.sqlite3
-
-#extraer la conexión
 # Crear conexión a la base de datos
 conn = sqlite3.connect(os.path.join(main_directory, database_directory))
 cursor = conn.cursor()

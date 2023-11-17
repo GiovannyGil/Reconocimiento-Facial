@@ -5,8 +5,6 @@ import face_recognition as fr
 import sqlite3
 from datetime import datetime
 import os
-from django.db import connections
-import django
 
 conn = sqlite3.connect('reconocimiento.db')
 
@@ -60,7 +58,7 @@ while True:
     # convertir de BGR A RGB
     rgb = cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
     # instanciar el rostro con el nuevo color
-    faces = fr.face_locations(rgb)
+    faces = fr.face_locations(rgb, model="haarcascade_frontalface_default.xml")
     # codificar el rostro
     facesCod = fr.face_encodings(rgb, faces)
     
@@ -81,10 +79,9 @@ while True:
             apellido = user_data[1] # estraer el apellido
             foto_path = user_data[2] # estraer la foto (LA RUTA DE LA FOTO)
             known_image = fr.load_image_file(foto_path) # cargar ruta de la foto
+            # print(foto_path)
             known_face_encoding = fr.face_encodings(known_image)[0] # 
-
             results = fr.compare_faces([known_face_encoding], faceCod)
-            # print(f"Comparación para {nombre}: {results[0]}") # me envia un mensaje de comparacion por cada usuario en la base de datos
 
             if results[0]: #
                 match = True
@@ -137,7 +134,7 @@ while True:
     cv2.imshow('RECONOCIMIENTO FACIAL', frame) # titulo del frame
 
     # establecer que si se preciola la tecla esc se termina la ejecucion
-    t = cv2.waitKey(1) 
+    t = cv2.waitKey(1)
     if t == 27:
         break
 
