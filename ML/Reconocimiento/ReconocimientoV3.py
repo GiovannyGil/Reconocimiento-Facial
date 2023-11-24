@@ -46,12 +46,12 @@ with mp_face_mesh.FaceMesh(
         
         frame_copy = frame.copy()
 
-        for (x, y, w, h) in faces:
-            x -= 25
-            y -= 25
-            w += 50
-            h += 50
-            cv2.rectangle(frame_copy, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # for (x, y, w, h) in faces:
+        #     x -= 25
+        #     y -= 25
+        #     w += 50
+        #     h += 50
+        #     cv2.rectangle(frame_copy, (x, y), (x + w, y + h), (0, 255, 0), 2)
         
         if results.multi_face_landmarks is not None:
             for face_landmarks in results.multi_face_landmarks:
@@ -59,7 +59,14 @@ with mp_face_mesh.FaceMesh(
                     mp_face_mesh.FACE_CONNECTIONS,
                     mp_drawing.DrawingSpec(color=(0, 0, 0), thickness=1, circle_radius=1),
                     mp_drawing.DrawingSpec(color=(255, 255, 255), thickness=1))
-        
+            
+                for (x, y, w, h) in faces:
+                    x -= 25
+                    y -= 25
+                    w += 50
+                    h += 50
+                    cv2.rectangle(frame_copy, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            
         cv2.imshow("RECONOCIMIENTO FACIAL", frame_copy)
 
         # establecer que si se preciola la tecla esc se termina la ejecucion
