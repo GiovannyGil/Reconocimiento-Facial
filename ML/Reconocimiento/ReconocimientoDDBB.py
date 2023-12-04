@@ -38,7 +38,7 @@ def registrar_registro(usuario_id):
     # Verificar si ha pasado al menos 10 segundos desde el último registro
     if ultima_hora_registro is None or (hora_actual - ultima_hora_registro).total_seconds() >= 10:
         # Insertar el registro en la tabla Registros
-        cursor.execute("INSERT INTO Registros (UsuariosID, Fecha) VALUES (?, ?)", (usuario_id, hora_entrada))
+        cursor.execute("INSERT INTO Registros (UsuarioID, Fecha) VALUES (?, ?)", (usuario_id, hora_entrada))
         conn.commit() # guardar cambios
         ultima_hora_registro = hora_actual # comparar horas (verificar si genera otro registro o no)
 
