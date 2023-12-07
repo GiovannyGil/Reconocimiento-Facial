@@ -109,7 +109,7 @@ while True:
             print(f'Usuario reconocido: {nombre}') # mostraer el nombre del usuario reconocido (en consola)
             
             # declarar si tiene acceso o no
-            Acceso = 1
+            Acceso = 1 
             if Acceso == 1:
                 print('Acceso Permitido')
             else:
@@ -117,11 +117,11 @@ while True:
             
             # agregar un registro a la tabla (REGISTROS) de la BBDD cada 10 seundos (si es el mismo rostro)
             cursor.execute("SELECT ID FROM usuarios_persona WHERE nombres = ?", (nombre,))
-            result = cursor.fetchone()
-            if result:
-                usuario_id = result[0]
-                registrar_registro(usuario_id)
-        else:
+            result = cursor.fetchone() # extraer el resultado
+            if result: # si hay resultado
+                usuario_id = result[0] # extraer el ID del usuario
+                registrar_registro(usuario_id) # registrar el registro(fecha y hora del reconocimiento)
+        else: 
             # Si no se detecta un rostro conocido, pintar un cuadro rojo con "desconocido"
             # Obtener las coordenadas
             y1, x2, y2, x1 = faceloc
@@ -148,10 +148,8 @@ while True:
     if t == 27:
         break
 
-# definir acceso a las instalaciones
-AccesoInstalaciones = Acceso
-print(f'El Acceso es: {AccesoInstalaciones}')
-
+# cerrar la conexion a la base de datos
+conn.close()
 # cerrar la ventana
 cap.release()
 cv2.destroyAllWindows()
