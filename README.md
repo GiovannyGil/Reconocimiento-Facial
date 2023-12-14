@@ -12,9 +12,7 @@ version usada de Python: 3.7.12
 TECNOLOGIAS USADAS
 - OpenCV*
 - Mediapipe* -> face_mesh
-- face_recognition*
-- numpy
-- pandas
+- face_recognition
 - ...
 
 Proyecto realizado como parte de las practicas, correspondientes al tecnologo

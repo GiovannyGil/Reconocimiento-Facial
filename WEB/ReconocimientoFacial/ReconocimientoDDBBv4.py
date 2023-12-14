@@ -1,11 +1,11 @@
 #importar dependencias
-import cv2 # Importa la librería OpenCV
-import face_recognition as fr # Importa la librería face_recognition
-import sqlite3 # Importa la librería sqlite3
-from datetime import datetime # Importa la librería datetime
-import os.path # Importa la librería os.path
-import Jetson.GPIO as GPIO  # Importa la librería Jetson.GPIO
-import time  # Importa la librería time
+import cv2
+import face_recognition as fr
+import sqlite3
+from datetime import datetime
+import os.path
+import time
+import Jetson.GPIO as GPIO
 
 # ruta principal
 main_directory = os.path.dirname(os.path.abspath(__file__)) # obtener la ruta principal dinamicamente en cualquier sitio y S.O
@@ -43,8 +43,7 @@ def conectar():
 
     #extraer los datos de la consulta
     users_data = cursor.fetchall()
-    return users_data # retornar los datos
-
+    return users_data
 
 # funcion para capturar la fecha y hora de reconocimiento
 def registrar_registro(usuario_id):
@@ -61,19 +60,19 @@ def registrar_registro(usuario_id):
         
 # funcion para detectar rostros
 def detectar_rostros(frame):
-    frame2 = cv2.resize(frame, (0, 0), None, 0.25, 0.25) # redimensionar el frame
-    rgb = cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB) # convertir el frame a RGB
-    faces = fr.face_locations(rgb) # instanciar el rostro con el nuevo color
-    facesCod = fr.face_encodings(rgb, faces) # codificar el rostro
-    return faces, facesCod # retornar el rostro y la codificacion
+    frame2 = cv2.resize(frame, (0, 0), None, 0.25, 0.25)
+    rgb = cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
+    faces = fr.face_locations(rgb)
+    facesCod = fr.face_encodings(rgb, faces)
+    return faces, facesCod
 
-# funcion para dibujar el recuadro 
-def dibujar_recuadro(frame, faceloc, color, text=''): 
-    y1, x2, y2, x1 = faceloc # extraer las coordenadas
-    y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4 # multiplicar las coordenadas por 4
-    cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2) # dibujar el recuadro de la parte superior
-    cv2.rectangle(frame, (x1, y2 - 35), (x2, y2), color, cv2.FILLED) # dibujar el recuadro de la parte inferior
-    cv2.putText(frame, text, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2) # dibujar el texto
+# funcion para dibujar el recuadro
+def dibujar_recuadro(frame, faceloc, color, text=''):
+    y1, x2, y2, x1 = faceloc
+    y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
+    cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+    cv2.rectangle(frame, (x1, y2 - 35), (x2, y2), color, cv2.FILLED)
+    cv2.putText(frame, text, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
 
 # funcion para extraer la informacion
 def cargar_y_comparar_rostro(users_data, faceCod):
@@ -86,44 +85,62 @@ def cargar_y_comparar_rostro(users_data, faceCod):
         known_face_encoding = fr.face_encodings(known_image)[0] # 
 
         results = fr.compare_faces([known_face_encoding], faceCod)
-        # print(f"Comparación para {nombre}: {results[0]}") # me envia un mensaje de comparacion por cada usuario en la base de datos
+        # print(f"Compa
 
-        if results[0]: # 
-            match = True # instanciar
-            break 
+        if results[0]: #
+            match = True
+            break
     return nombre, match
+
+def pulso(Acceso):
+    if Acceso == 1:
+        print(f'Acceso Permitido {Acceso}')
+
+        # enviar pulso 
+        PIN = 7
+        try:
+            # configurar el modo del pin como salida
+            GPIO.setmode(GPIO.BOARD)
+            GPIO.setup(PIN, GPIO.OUT)
+    
+            # Enviar un pulso de 5V durante 5 segundos
+            GPIO.output(PIN, GPIO.HIGH)
+            time.sleep(15) # esperar 5 segundos
+            GPIO.output(PIN, GPIO.LOW)
+        finally:
+            # limpiar losp ines GPIO al finalizar
+            GPIO.cleanup()
+    
+    else:
+        print(f'Acceso Denegado  {Acceso}')
 
 # funcion para detectar el match
 def Match(nombre, match, frame, faceloc, color):
-    if match: # si hay match
-        dibujar_recuadro(frame, faceloc, color, nombre) # dibujar el recuadro
-        print(f'Usuario reconocido: {nombre}') # mostraer el nombre del usuario reconocido (en consola)
-        Acceso = 1 # instanciar variable en 1
-        if Acceso == 1: # si tiene acceso
-            print(f'Acceso Permitido, {Acceso} ')  # mostrar en consola que tiene acceso
-
-            # enviar pulso 
-            PIN = 7 # numero del pin
-            try: # intentar realizar la accion de enviar el pulso al pin de Jetson Nano
-                # configurar el modo del pin como salida
-                GPIO.setmode(GPIO.BOARD) # modo BOARD
-                GPIO.setup(PIN, GPIO.OUT) # configurar el pin como salida
-            
-                # Enviar un pulso de 5V durante 5 segundos
-                GPIO.output(PIN, GPIO.HIGH) # enviar pulso
-                time.sleep(15) # esperar 5 segundos
-                GPIO.output(PIN, GPIO.LOW) # detener pulso
-            finally:
-                # limpiar losp ines GPIO al finalizar
-                GPIO.cleanup() # limpiar los pines GPIO
-        
-        else:
-            print(f'Acceso Denegado, {Acceso}') # mostrar en consola que no tiene acceso
+    if match:
+        dibujar_recuadro(frame, faceloc, color, nombre)
+        print(f'Usuario reconocido: {nombre}')
+        Acceso = 1
+        pulso(Acceso)
                 
+        # agregar un registro a la tabla (REGISTROS) de la BBDD cada 10 seundos (si es el mismo rostro)
+        cursor.execute("SELECT ID FROM usuarios_persona WHERE nombres = ?", (nombre,))
+        result = cursor.fetchone()
+        if result:
+            usuario_id = result[0]
+            registrar_registro(usuario_id)
+    else:
+        dibujar_recuadro(frame, faceloc, color_rojo, 'Desconocido')
+        print('Usuario No Reconocido')
+        Acceso = 0 # instanciar variable en 0
+        pulso(Acceso)
+        
+    # Puedes ajustar el tiempo de espera según las necesidades
+    time.sleep(1)
+    
 
 # funcion principal
 def main():
-    global Acceso # instanciar variable global
+    global Acceso
     while True:
         # Capturar frame por frame
         ret, frame = cap.read()
@@ -137,19 +154,20 @@ def main():
             nombre, match = cargar_y_comparar_rostro(users_data, faceCod)
             # Dibujar recuadro
             Match(nombre, match, frame, faceloc, color_verde)
+            
         # Mostrar frame
         cv2.imshow('RECONOCIMIENTO FACIAL', frame)
         # Salir con ESC
         t = cv2.waitKey(1)
         if t == 27:
             break
-
-    # Cerrar la conexion con la BBDD
-    conn.close()
+    
     # Liberar la cámara
     cap.release()
     # Cerrar todas las ventanas
     cv2.destroyAllWindows()
+    # Cerrar la conexión a la base de datos
+    conn.close()
     
 # Ejecutar el programa
 if __name__ == "__main__":

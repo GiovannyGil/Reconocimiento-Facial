@@ -2,6 +2,11 @@
 {% load static %}
 
 {% block content %}
+
+<head>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
 <a
 type="button"
 title="Agregar Nuevos Usuarios"
@@ -14,9 +19,9 @@ class="border border-gray-700 bg-gray-700 text-white rounded-md px-4 py-2 m-2 tr
 <div>
     <div>
         <h2>Lista de Usuarios</h2>
-        <table id="example" class="display" style="width:100%">
-            <thead>
-                <tr>
+        <table id="example" class="display" style="width:100%" class="text-white">
+            <thead class="text-white">
+                <tr class="text-white">
                     <th>#</th>
                     <th>nombres</th>
                     <th>apellidos</th>
@@ -27,7 +32,7 @@ class="border border-gray-700 bg-gray-700 text-white rounded-md px-4 py-2 m-2 tr
             </thead>
                 <tbody>
                 {% for per in personas %}
-                    <tr>
+                    <tr class="text-white">
                         <td>{{per.id}}</td>
                         <td>{{per.nombres}}</td>
                         <td>{{per.apellidos}}</td>
@@ -56,7 +61,7 @@ class="border border-gray-700 bg-gray-700 text-white rounded-md px-4 py-2 m-2 tr
                 {% endfor %}
                 </tbody>
             <tfoot>
-                <tr>
+                <tr class="text-white">
                     <th>#</th>
                     <th>nombres</th>
                     <th>apellidos</th>
@@ -73,6 +78,3 @@ class="border border-gray-700 bg-gray-700 text-white rounded-md px-4 py-2 m-2 tr
 </script>
 
 {% endblock %}
-<script>
-    new DataTable('#example');
-</script>

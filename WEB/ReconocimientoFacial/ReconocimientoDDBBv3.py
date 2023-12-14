@@ -4,6 +4,9 @@ import face_recognition as fr
 import sqlite3
 from datetime import datetime
 import os.path
+import time
+# import RPi.GPIO as GPIO
+import Jetson.GPIO as GPIO
 
 main_directory = os.path.dirname(os.path.abspath(__file__)) # obtener la ruta principal dinamicamente en cualquier sitio y S.O
 media_directory = 'media/' # ruta para ir a la media => ubicacion de las fotos
@@ -29,6 +32,7 @@ def registrar_registro(usuario_id): # funcion para registrar el registro(fecha y
         cursor.execute("INSERT INTO usuarios_registros (UsuarioID_id, fecha) VALUES (?, ?)", (usuario_id, hora_entrada)) # Insertar el registro en la tabla Registros
         conn.commit() # guardar cambios
         ultima_hora_registro = hora_actual # comparar horas (verificar si genera otro registro o no)
+
 
 def cargar_usuarios(): # funcion para cargar los usuarios
     cursor.execute('SELECT nombres, apellidos, foto FROM usuarios_persona') # extraer los datos de la consulta
@@ -57,23 +61,55 @@ def cargar_y_comparar_rostro(user_data, faceCod): # funcion para cargar y compar
     results = fr.compare_faces([known_face_encoding], faceCod) # comparar el rostro
     return results[0] # retornar el resultado
 
+def pulso(Acceso):
+    if Acceso == 1:
+        print('Acceso Permitido ',Acceso)
+
+        # enviar pulso 
+        lista_pines = [7, 8, 9]
+        try:
+            # Configurar el modo del pin como salida
+            GPIO.setmode(GPIO.BOARD)
+
+            # Configurar todos los pines en la lista como salida
+            for pin in lista_pines:
+                GPIO.setup(pin, GPIO.OUT)
+
+            # Enviar un pulso de 5V durante 5 segundos en cada pin
+            for pin in lista_pines:
+                GPIO.output(pin, GPIO.HIGH)
+            
+            time.sleep(10)  # Esperar 10 segundos
+            
+            # Apagar todos los pines al finalizar
+            for pin in lista_pines:
+                GPIO.output(pin, GPIO.LOW)
+        finally:
+            # Limpiar los pines GPIO al finalizar
+            GPIO.cleanup()
+    else:
+        print('Acceso Denegado ', Acceso)
+
 def procesar_resultado(match, frame, faceloc, color, nombre): # funcion para procesar el resultado
     if match: # si hay match
         dibujar_recuadro(frame, faceloc, color, nombre) # dibujar el recuadro
-        print(f'Usuario reconocido: {nombre}')  # mostraer el nombre del usuario reconocido (en consola)
+        print('Usuario reconocido: ', nombre)  # mostraer el nombre del usuario reconocido (en consola)
         Acceso = 1 # instanciar variable en 1
-        print(f'Acceso Permitido {Acceso}' if Acceso == 1 else f'Acceso Denegado {Acceso}') # mostrar si tiene acceso o no
+        pulso(Acceso)
+
         cursor.execute("SELECT ID FROM usuarios_persona WHERE nombres = ?", (nombre,)) # extraer el ID del usuario
         result = cursor.fetchone() # extraer el resultado
         if result: # si hay resultado
             usuario_id = result[0] # extraer el ID del usuario
             registrar_registro(usuario_id) # registrar el registro(fecha y hora del reconocimiento)
+
+
     else:
         dibujar_recuadro(frame, faceloc, color_rojo, 'Desconocido') # dibujar el recuadro en rojo y mostrar desconocido
         print('Usuario No Reconocido') # mostrar en consola que no se reconoce el usuario
         Acceso = 0 # instanciar variable en 0
-        print(f'Acceso Denegado {Acceso}' if Acceso == 0 else f'Acceso Permitido {Acceso}') # mostrar si tiene acceso o no
-
+        pulso(Acceso)
+        
 def reconocer_rostro(frame, users_data, facesCod, faces): # funcion para reconocer rostros
     global Acceso # instanciar variable global
     for faceCod, faceloc in zip(facesCod, faces): # extraer la informacion del rostro

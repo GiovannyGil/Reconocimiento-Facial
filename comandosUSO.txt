@@ -1,0 +1,7 @@
+-- INICIAR EL ENTORNO VIRTUAL DE VIRTUALENV
+
+source ~/Documentos/ReconocimientoFacial/G36/bin/activate
+
+
+-- INICIAR EL SCRIPT "nombre del script.py"
+sudo ~/Documentos/ReconocimientoFacial/G36/bin/python ReconocimientoDDBBv3.py
